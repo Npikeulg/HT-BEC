@@ -53,6 +53,9 @@ for mp_id, struct in structdata.items():
         c += 1
         print(c) # a simple counter so we know that MPRester is working
         data = mp.get_data(mp_id)
+        if c >= 75:
+            break
+        
         
         # extract some data from materials project
         try:
@@ -121,6 +124,8 @@ for mp_id, struct in structdata.items():
                                                         
         # add data to data_array
         data_array.append(formula)
+        data_array.append(bec_weird)
+        data_array.append(coord_env)
         data_array.append(get_sym)
         data_array.append(spgnum)
         data_array.append(bandgap)
@@ -138,10 +143,8 @@ for mp_id, struct in structdata.items():
         data_array.append(dielectric[0][0])
         data_array.append(dielectric[1][1])
         data_array.append(dielectric[2][2])
-        data_array.append(bec_weird)
         data_array.append(odd_atom)
         data_array.append(atcharge)
-        data_array.append(coord_env)
         data_array.append(zatom[0])       
         data_array.append(zatom[1])
         data_array.append(zatom[2])
@@ -175,9 +178,10 @@ for mp_id, struct in structdata.items():
 print('Completed gathering all data.\n')
 print('Starting analysis of full database.\n')
 
-columns = ['formula','sym','spgnum','Eg','volume','eng/atom','Gvoigt','kvoigt',
+columns = ['formula','bec_odd','coord_env',
+           'sym','spgnum','Eg','volume','eng/atom','Gvoigt','kvoigt',
            'poisson', 'sxx','syy','szz','sxy','syz','sxz','exx','eyy','ezz',
-           'bec_odd','odd_atom','atcharge','coord_env','zxx','zyy','zzz',
+           'odd_atom','atcharge','zxx','zyy','zzz',
            'a','b','c','a^-2','b^-2','c^-2','alpha','beta','gamma','E_p','E_a',
            'E_g','group','period','E_aff','block','R_vdw','R_at','atmass',
            'atnum']
@@ -206,7 +210,7 @@ df.to_csv('database_full.csv')
 strcolumns = [col for col, dt in df.dtypes.items() if dt == object]
 boolcolumns = [col for col,dt in df.dtypes.items() if dt == bool]
 for col in strcolumns:
-    if col != 'formula':  # formula is always unique.. that is way to many files!
+    if col != 'formula':  # formula is always unique.. that is way too many files!
         # get column values 
         colvalues = df[col]
         # find unique values
@@ -217,30 +221,7 @@ for col in strcolumns:
             dffilter = df.loc[df[col]== uniq]
             # dump filtered matrix to a csv file
             dffilter.to_csv('database_filtered_'+col+'_'+uniq+'.csv')
-            # note! figure size is in inches
-            # needed to adjust columns
-            colstart = 'sym'
-            colend =  'sxx'
-            fig = pd.plotting.scatter_matrix(dffilter.loc[:,colstart:colend],figsize=(12,12),diagonal='kde')
-            plt.savefig('fig_filtered_'+col+'_'+uniq+'_1.png')
-            colstart = 'syy'
-            colend =  'ezz'
-            fig = pd.plotting.scatter_matrix(dffilter.loc[:,colstart:colend],figsize=(12,12),diagonal='kde')
-            plt.savefig('fig_filtered_'+col+'_'+uniq+'_2.png')
-            colstart = 'zxx'
-            colend =  'c^-2'
-            fig = pd.plotting.scatter_matrix(dffilter.loc[:,colstart:colend],figsize=(12,12),diagonal='kde')
-            plt.savefig('fig_filtered_'+col+'_'+uniq+'_3.png')
-            colstart = 'alpha'
-            colend =  'period'
-            fig = pd.plotting.scatter_matrix(dffilter.loc[:,colstart:colend],figsize=(12,12),diagonal='kde')
-            plt.savefig('fig_filtered_'+col+'_'+uniq+'_4.png')
-            colstart = 'E_aff'
-            colend =  'atnum'
-            fig = pd.plotting.scatter_matrix(dffilter.loc[:,colstart:colend],figsize=(12,12),diagonal='kde')
-            plt.savefig('fig_filtered_'+col+'_'+uniq+'_4.png')
-            
-                     
+                                 
             # find correlation matrix again
             corr_filter = dffilter.corr(method='pearson')
             # Dumps data to a csv file
@@ -258,28 +239,6 @@ for col in strcolumns:
                     dfBEC = dffilter.loc[dffilter[col2]==uniq2]
                     # dump filtered matrix to a csv file
                     dfBEC.to_csv('database_filtered_'+col+'_'+uniq+'_'+col2+'_'+str(uniq2)+'.csv')
-                    # note! figure size is in inches
-                    # needed to adjust columns
-                    colstart = 'sym'
-                    colend =  'sxx'
-                    fig = pd.plotting.scatter_matrix(dfBEC.loc[:,colstart:colend],figsize=(12,12),diagonal='kde')
-                    plt.savefig('fig_filtered_'+col+'_'+uniq+'_'+col2+'_'+str(uniq2)+'_1.png')
-                    colstart = 'syy'
-                    colend =  'ezz'
-                    fig = pd.plotting.scatter_matrix(dfBEC.loc[:,colstart:colend],figsize=(12,12),diagonal='kde')
-                    plt.savefig('fig_filtered_'+col+'_'+uniq+'_'+col2+'_'+str(uniq2)+'_2.png')
-                    colstart = 'zxx'
-                    colend =  'c^-2'
-                    fig = pd.plotting.scatter_matrix(dfBEC.loc[:,colstart:colend],figsize=(12,12),diagonal='kde')
-                    plt.savefig('fig_filtered_'+col+'_'+uniq+'_'+col2+'_'+str(uniq2)+'_3.png')
-                    colstart = 'alpha'
-                    colend =  'period'
-                    fig = pd.plotting.scatter_matrix(dfBEC.loc[:,colstart:colend],figsize=(12,12),diagonal='kde')
-                    plt.savefig('fig_filtered_'+col+'_'+uniq+'_'+col2+'_'+str(uniq2)+'_4.png')
-                    colstart = 'E_aff'
-                    colend =  'atnum'
-                    fig = pd.plotting.scatter_matrix(dfBEC.loc[:,colstart:colend],figsize=(12,12),diagonal='kde')
-                    plt.savefig('fig_filtered_'+col+'_'+uniq+'_'+col2+'_'+str(uniq2)+'_5.png')
                     # find correlation matrix again
                     corr_BEC= dfBEC.corr(method='pearson')
                     # dump correlation to a file
