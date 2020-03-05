@@ -53,8 +53,8 @@ for mp_id, struct in structdata.items():
         c += 1
         print(c) # a simple counter so we know that MPRester is working
         data = mp.get_data(mp_id)
-        if c >= 75:
-            break
+#        if c >= 75:
+#            break
         
         
         # extract some data from materials project
@@ -134,6 +134,7 @@ for mp_id, struct in structdata.items():
         data_array.append(GV)
         data_array.append(KV)
         data_array.append(poisson)
+        data_array.append(elastic[0][1]-elastic[3][3])
         data_array.append(elastic[0][0])
         data_array.append(elastic[1][1])
         data_array.append(elastic[2][2])
@@ -180,7 +181,7 @@ print('Starting analysis of full database.\n')
 
 columns = ['formula','bec_odd','coord_env',
            'sym','spgnum','Eg','volume','eng/atom','Gvoigt','kvoigt',
-           'poisson', 'sxx','syy','szz','sxy','syz','sxz','exx','eyy','ezz',
+           'poisson', 'cauchy','sxx','syy','szz','sxy','syz','sxz','exx','eyy','ezz',
            'odd_atom','atcharge','zxx','zyy','zzz',
            'a','b','c','a^-2','b^-2','c^-2','alpha','beta','gamma','E_p','E_a',
            'E_g','group','period','E_aff','block','R_vdw','R_at','atmass',
